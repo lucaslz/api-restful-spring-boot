@@ -1,5 +1,6 @@
 package com.example.carros.api;
 
+import java.net.URI;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.example.carros.dominio.CarroService;
 import com.example.carros.dto.CarroDTO;
@@ -48,20 +50,35 @@ public class CarroController {
 	}
 	
 	@PostMapping
-	public String post(@RequestBody Carro carro) {
-		Carro carroSave = carroService.save(carro);
-		return "Carro salvo com sucesso: " + carroSave.getId();
+	public ResponseEntity<?> post(@RequestBody Carro carro) {
+		try {
+			CarroDTO c = carroService.save(carro);		
+			URI location = getURI(c.getId());
+			return ResponseEntity.created(location).build();
+		} catch (Exception e) {
+			return ResponseEntity.badRequest().build();
+		}
+	}
+	
+	private URI getURI(Long id) {
+		return ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
+				.buildAndExpand(id).toUri();
 	}
 	
 	@PutMapping("/{id}")
-	public String put(@PathVariable("id") Long id, @RequestBody Carro carro) {
-		Carro c = carroService.update(id, carro);
-		return "Carro atualizado com sucesso: " + c.getId();
+	public ResponseEntity<?> put(@PathVariable("id") Long id, @RequestBody Carro carro) {
+		CarroDTO c = carroService.update(id, carro);
+		return c != null ?
+				ResponseEntity.ok(c) :
+					ResponseEntity.notFound().build();
 	}
 	
 	@DeleteMapping("/{id}")
-	public String delete(@PathVariable("id") Long id) {
-		carroService.delete(id);
-		return "Carro deletado com sucesso: " + id;
+	public ResponseEntity<?> delete(@PathVariable("id") Long id) {
+		boolean ok = carroService.delete(id);
+		
+		return ok ?
+				ResponseEntity.ok().build() :
+					ResponseEntity.notFound().build();
 	}
 }

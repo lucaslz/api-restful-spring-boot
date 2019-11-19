@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 
 import com.example.carros.dto.CarroDTO;
 
@@ -27,25 +28,28 @@ public class CarroService {
 		return carroRepository.findByTipo(tipo).stream().map(CarroDTO::create).collect(Collectors.toList());
 	}
 
-	public Carro save(Carro carro) {
-		return carroRepository.save(carro);
+	public CarroDTO save(Carro carro) {
+		Assert.isNull(carro.getId(), "Não foi possível atualizar o registro");
+		return CarroDTO.create(carroRepository.save(carro));
 	}
 
-	public Carro update(Long id, Carro carro) {
+	public CarroDTO update(Long id, Carro carro) {
 		return carroRepository.findById(id).map(carroDataBase -> {
 			carroDataBase.setNome(carro.getNome());
 			carroDataBase.setTipo(carro.getTipo());
 			
 			carroRepository.save(carroDataBase);
-			return carroDataBase;
-		}).orElseThrow(() -> new RuntimeException("Não foi possível atualizar o registro"));
+			return CarroDTO.create(carroDataBase);
+		}).orElse(null);
 	}
 
-	public void delete(Long id) {
+	public boolean delete(Long id) {
 		Optional<Carro> carro = carroRepository.findById(id);
 
 		if (carro.isPresent()) {
 			carroRepository.deleteById(id);
+			return true;
 		}
+		return false;
 	}
 }
