@@ -1,19 +1,18 @@
 package com.example.carros;
 
-import static org.junit.Assert.*;
-
-import java.util.List;
-import java.util.Optional;
-
+import com.example.carros.dominio.Carro;
+import com.example.carros.dominio.CarroService;
+import com.example.carros.dto.CarroDTO;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import com.example.carros.dominio.Carro;
-import com.example.carros.dominio.CarroService;
-import com.example.carros.dto.CarroDTO;
+import java.util.List;
+import java.util.Optional;
+
+import static org.junit.Assert.*;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -48,7 +47,16 @@ class CarrosApplicationTests {
 	@Test
 	public void testLista() {
 		List<CarroDTO> carros = carroService.getCarros();
-		System.err.println("O tamanho é: " + carros.size());
-		assertEquals(1, carros.size());
+		System.err.println("Tamanho: " + carros.size());
+		assertEquals(30, carros.size());
+	}
+
+	@Test
+	public void testGet() {
+		assertEquals(10, carroService.findByTipo("classicos").size());
+		assertEquals(10, carroService.findByTipo("esportivos").size());
+		assertEquals(10, carroService.findByTipo("luxo").size());
+
+		assertEquals(0, carroService.findByTipo("x").size());
 	}
 }
