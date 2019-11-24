@@ -44,7 +44,7 @@ public class CarrosAPITest {
         carro.setTipo("esportivos");
 
         //Inserindo carro
-        ResponseEntity response = rest.withBasicAuth("admin", "123").postForEntity("/api/v1/carros", carro, null);
+        ResponseEntity<?> response = rest.withBasicAuth("admin", "123").postForEntity("/api/v1/carros", carro, null);
 
         //Verificando se o carro foi criado
         assertEquals(HttpStatus.CREATED, response.getStatusCode());

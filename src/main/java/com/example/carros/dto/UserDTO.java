@@ -1,6 +1,9 @@
 package com.example.carros.dto;
 
-import com.example.carros.dominio.Carro;
+import com.example.carros.dominio.User;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import lombok.Data;
 import org.modelmapper.ModelMapper;
 
@@ -13,8 +16,24 @@ public class UserDTO {
 	private String nome;
 	private String senha;
 	
-	public static CarroDTO create(Carro c) {
+    //token JWT
+    private String token;
+
+    public static UserDTO create(User user, String token) {
+        ModelMapper modelMapper = new ModelMapper();
+        UserDTO dto = modelMapper.map(user, UserDTO.class);
+        dto.token = token;
+        return dto;
+    }
+
+    public String toJson() throws JsonProcessingException {
+        ObjectMapper m = new ObjectMapper();
+        return m.writeValueAsString(this);
+    }
+	
+	public static UserDTO create(User u) {
 		ModelMapper modelMapper = new ModelMapper();
-		return modelMapper.map(c, CarroDTO.class);
+		return modelMapper.map(u, UserDTO.class);
 	}
+	
 }
