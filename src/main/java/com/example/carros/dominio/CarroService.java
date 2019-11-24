@@ -1,14 +1,12 @@
 package com.example.carros.dominio;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
+import com.example.carros.dto.CarroDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
-import com.example.carros.dto.CarroDTO;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class CarroService {
@@ -20,8 +18,10 @@ public class CarroService {
 		return carroRepository.findAll().stream().map(CarroDTO::create).collect(Collectors.toList());
 	}
 
-	public Optional<CarroDTO> findById(Long id) {	
-		return carroRepository.findById(id).map(CarroDTO::create);
+	public CarroDTO findById(Long id) {
+		return carroRepository.findById(id)
+				.map(CarroDTO::create)
+				.orElseThrow(() -> new ObjectNotFoundException("Carro não encontrado"));
 	}
 
 	public List<CarroDTO> findByTipo(String tipo) {
@@ -43,13 +43,7 @@ public class CarroService {
 		}).orElse(null);
 	}
 
-	public boolean delete(Long id) {
-		Optional<Carro> carro = carroRepository.findById(id);
-
-		if (carro.isPresent()) {
-			carroRepository.deleteById(id);
-			return true;
-		}
-		return false;
+	public void delete(Long id) {
+		carroRepository.deleteById(id);
 	}
 }

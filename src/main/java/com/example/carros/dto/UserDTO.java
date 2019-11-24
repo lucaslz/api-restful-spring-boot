@@ -5,16 +5,13 @@ import lombok.Data;
 import org.modelmapper.ModelMapper;
 
 @Data
-public class CarroDTO {
+public class UserDTO {
 
 	private Long id;
-	private String tipo;
+	private String email;
+	private String login;
 	private String nome;
-	private String descricao;
-	private String urlFoto;
-	private String urlVideo;
-	private String latitude;
-	private String longitude;
+	private String senha;
 	
 	public static CarroDTO create(Carro c) {
 		ModelMapper modelMapper = new ModelMapper();

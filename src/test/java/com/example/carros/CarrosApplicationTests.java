@@ -2,6 +2,7 @@ package com.example.carros;
 
 import com.example.carros.dominio.Carro;
 import com.example.carros.dominio.CarroService;
+import com.example.carros.dominio.ObjectNotFoundException;
 import com.example.carros.dto.CarroDTO;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
@@ -10,7 +11,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.List;
-import java.util.Optional;
 
 import static org.junit.Assert.*;
 
@@ -32,16 +32,21 @@ class CarrosApplicationTests {
 		
 		Long id = c.getId();
 		assertNotNull(id);
+
+		c = carroService.findById(id);
+		assertNotNull(c);
 		
-		Optional<CarroDTO> op = carroService.findById(id);
-		assertTrue(op.isPresent());
-		
-		c = op.get();
 		assertEquals("Ferrari", c.getNome());
 		assertEquals("Luxo", c.getTipo());
 		
 		carroService.delete(id);
-		assertFalse(carroService.findById(id).isPresent());
+
+		try {
+			assertNull(carroService.findById(id));
+			fail("O carro não existe no banco de dados");
+		}catch (ObjectNotFoundException ex) {
+
+		}
 	}
 	
 	@Test
