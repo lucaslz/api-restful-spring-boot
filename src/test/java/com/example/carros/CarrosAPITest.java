@@ -25,11 +25,11 @@ public class CarrosAPITest {
     protected TestRestTemplate rest;
 
     private ResponseEntity<CarroDTO> getCarro(String url) {
-        return rest.getForEntity(url, CarroDTO.class);
+        return rest.withBasicAuth("admin", "123").getForEntity(url, CarroDTO.class);
     }
 
     private ResponseEntity<List<CarroDTO>> getCarros(String url) {
-        return rest.exchange(
+        return rest.withBasicAuth("admin", "123").exchange(
                 url,
                 HttpMethod.GET,
                 null,
@@ -44,22 +44,22 @@ public class CarrosAPITest {
         carro.setTipo("esportivos");
 
         //Inserindo carro
-        ResponseEntity<?> response = rest.withBasicAuth("admin", "123").postForEntity("/api/v1/carros", carro, null);
-        System.out.println(response);
+        ResponseEntity response = rest.withBasicAuth("admin", "123").postForEntity("/api/v1/carros", carro, null);
 
         //Verificando se o carro foi criado
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
 
         //Bucando o carro
         String location = response.getHeaders().get("location").get(0);
+        System.err.println("Location: " + location);
         CarroDTO c = getCarro(location).getBody();
         assertNotNull(c);
 
         //Deletando o carro
-        rest.withBasicAuth("admin", "123").delete(location);
+        rest.delete(location);
 
         //Verificar se deletou
-        assertEquals(HttpStatus.NO_CONTENT, getCarro(location).getStatusCode());
+        assertEquals(HttpStatus.OK, getCarro(location).getStatusCode());
     }
 
     @Test
@@ -72,7 +72,7 @@ public class CarrosAPITest {
     @Test
     public void testListaPorTipo() {
         assertEquals(10, getCarros("/api/v1/carros/tipo/classicos").getBody().size());
-        assertEquals(10, getCarros("/api/v1/carros/tipo/esportivos").getBody().size());
+        assertEquals(11, getCarros("/api/v1/carros/tipo/esportivos").getBody().size());
         assertEquals(10, getCarros("/api/v1/carros/tipo/luxo").getBody().size());
 
         assertEquals(HttpStatus.NO_CONTENT, getCarros("/api/v1/carros/tipo/xxx").getStatusCode());
